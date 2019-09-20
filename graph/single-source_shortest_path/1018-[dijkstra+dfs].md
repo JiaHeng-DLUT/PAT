@@ -1,6 +1,6 @@
 # [1018 Public Bike Management (30 point(s))](https://pintia.cn/problem-sets/994805342720868352/problems/994805489282433024)
 
-> 本题不能只使用 `Dijkstra` 来解决，因为 `minSend` 和 `minTakeBack` 在路径上的传递不满足最优子结构（不是简单的相加过程）。**只有当所有路径都确定后，才能计算 `send` 和 `takeBack`。
+> 本题不能只使用 `Dijkstra` 来解决，因为 `minSend` 和 `minTakeBack` 在路径上的传递不满足最优子结构（不是简单的相加过程）。**只有当一条完整的路径被确定后，才能计算这条路径的 `send` 和 `takeBack`。**
 
 ```c++
 #include <bits/stdc++.h>
