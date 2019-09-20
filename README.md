@@ -2,5 +2,5 @@
 
 - 2019 年 9 月 8 日，PAT 甲级 73 分
 
-- [**PAT 甲级题库索引表**](https://www.notion.so/062eceb4d5a44df4aaf00d30fe6837fb?v=089290cd8d6143fca2de6d1cd47b4055)
+- [**PAT 甲级题库索引表**](https://www.notion.so/479fef3881394f07b66e37aa57995a48?v=9d362ad7216148b4afd38e2f94b21a9c)
 
