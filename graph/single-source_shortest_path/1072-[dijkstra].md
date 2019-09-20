@@ -1,18 +1,105 @@
-# 1072
+# [1072 Gas Station (30 point(s))](https://pintia.cn/problem-sets/994805342720868352/problems/994805396953219072)
 
-- [1072 Gas Station (30 point(s))](https://pintia.cn/problem-sets/994805342720868352/problems/994805396953219072)
+> 所有无向边均真实存在，在 Dijkstra 算法的过程中需要考虑所有加油站，因此顶点范围是 `1 ~ (n + m)`。
 
-> 题目要求: 
->   - `Gas station` 能够到达 `all houses`
->   - `Gas station` 到 `all houses` 的 `minimum distance` 尽可能地大
->   - 根据 `gas station index` 排序时，不能使用 `string`，要转换成 `int` 排序，避免出现 `G1 < G123 < G2 < G23` 这样的情况
->
-> 作者：siukwan 
-> 来源：CSDN 
-> 原文：https://blog.csdn.net/jmlikun/article/details/50039563 
-> 版权声明：本文为博主原创文章，转载请附上博文链接！
+## 邻接表
 
-![Accepted](https://i.loli.net/2019/07/24/5d382b9d6464426512.png)
+```c++
+#include <bits/stdc++.h>
+using namespace std;
+const int MAX_V = 1e3 + 10 +10;
+const int INF = 0x3fffffff;
+
+struct Node {
+    int v, dis;
+    Node(int _v, int _dis): v(_v), dis(_dis) {}
+};
+vector<Node> g[MAX_V];
+int n, m, k, ds;
+int d[MAX_V], vis[MAX_V];
+
+void dijkstra(int s) {
+    fill(d, d + MAX_V, INF);
+    fill(vis, vis + MAX_V, 0);
+    d[s] = 0;
+    for (int  i = 0; i < n + m; i++) {
+        int u = -1, MIN = INF;
+        for (int j = 1; j <= n + m; j++) {
+            if (!vis[j] && d[j] < MIN) {
+                u = j;
+                MIN = d[j];
+            }
+        }
+        if (u == -1) {
+            return;
+        }
+        vis[u] = 1;
+        for (int j = 0; j < g[u].size(); j++) {
+            int v = g[u][j].v;
+            int dis = g[u][j].dis;
+            if (!vis[v] && d[u] + dis < d[v]) {
+                d[v] = d[u] + dis;
+            }
+        }
+    }
+}
+
+int getID(string s) {
+    if (s[0] == 'G') {
+        return stoi(s.substr(1)) + n;
+    }
+    else {
+        return stoi(s);
+    }
+}
+
+int main() {
+    scanf("%d%d%d%d", &n, &m, &k, &ds);
+    for (int i = 0; i < k; i++) {
+        string p1, p2;
+        int dis;
+        cin >> p1 >> p2 >> dis;
+        int u = getID(p1);
+        int v = getID(p2);
+        g[u].push_back(Node(v, dis));
+        g[v].push_back(Node(u, dis));
+    }
+    int index = -1, maxMin = 0, minAve = INF;
+    for (int i = n + 1; i <= n + m; i++) {
+        dijkstra(i);
+        int Min = INF, Ave = 0;
+        for (int j = 1; j <= n; j++) {
+            if (d[j] > ds) {
+                Min = -1;
+                break;
+            }
+            Ave += d[j];
+            Min = min(Min, d[j]);
+        }
+        if (Min != -1) {
+            if (Min > maxMin) {
+                index = i;
+                maxMin = Min;
+                minAve = Ave;
+            }
+            else if (Min == maxMin && Ave < minAve) {
+                index = i;
+                minAve = Ave;
+            }
+        }
+    }
+    if (index == -1) {
+        printf("No Solution\n");
+    }
+    else {
+        printf("G%d\n", index - n);
+        printf("%.1f %.1f\n", double(maxMin), double(double(minAve) / n));
+    }
+    return 0;
+}
+```
+
+## 邻接矩阵
 
 ```c++
 #include <iostream>
