@@ -1,8 +1,6 @@
-# 1111
+# [1111 Online Map (30 point(s))](https://pintia.cn/problem-sets/994805342720868352/problems/994805358663417856)
 
-- [1111 Online Map (30 point(s))](https://pintia.cn/problem-sets/994805342720868352/problems/994805358663417856)
-
-## Dijkstra
+## 邻接矩阵
 
 ![image.png](https://i.loli.net/2019/09/07/OqUoLMyX9wYt3iS.png)
 
@@ -197,168 +195,142 @@ Distance = 3; Time = 4: 3 -> 2 -> 5
 
 ```
 
-## MLE 的 DFS
-
-![image.png](https://i.loli.net/2019/09/06/zGqjrxihVFJWUMK.png)
+## 邻接表
 
 ```c++
-#include <iostream>
-#include <map>
-#include <vector>
+#include <bits/stdc++.h>
 using namespace std;
-const int MAX_N = 500;
+const int MAX_V = 500 + 5;
+const int INF = 0x3fffffff;
 
-map<int, int> length;
-map<int, int> tm;
-vector<int> g[MAX_N];
-int s, d;
-vector<vector<int>> res;
-vector<int> temp;
-bool vis[MAX_N] = { false };
+struct Node {
+    int v, dis, t;
+    Node(int _v, int _dis, int _t): v(_v), dis(_dis), t(_t) {}
+};
+vector<Node> g[MAX_V];
+int n, m, st, ed;
+int d[MAX_V], t[MAX_V], num[MAX_V], vis[MAX_V], pre[MAX_V];
+vector<int> path;
 
-void dfs(int root) {
-	if (root == d) {
-		res.push_back(temp);
-		return;
-	}
-	for (auto it : g[root]) {
-		if (!vis[it]) {
-			vis[it] = 1;
-			temp.push_back(it);
-			dfs(it);
-			temp.pop_back();
-			vis[it] = 0;
-		}
-	}
+void dijkstra_dis(int s) {
+    fill(d, d + MAX_V, INF);
+    fill(t, t + MAX_V, INF);
+    fill(vis, vis + MAX_V, 0);
+    d[s] = 0;
+    t[s] = 0;
+    for(int i = 0; i < n; i++) {
+        int u = -1, MIN = INF;
+        for (int j = 0; j < n; j++) {
+            if (!vis[j] && d[j] < MIN) {
+                u = j;
+                MIN = d[j];
+            }
+        }
+        if (u == -1) {
+            return;
+        }
+        vis[u] = 1;
+        for (int j = 0; j < g[u].size(); j++) {
+            int v = g[u][j].v;
+            int dis = g[u][j].dis;
+            int time = g[u][j].t;
+            if (!vis[v]) {
+                if (d[u] + dis < d[v]) {
+                    d[v] = d[u] + dis;
+                    t[v] = t[u] + time;
+                    pre[v] = u;
+                }
+                else if (d[u] + dis == d[v] && t[u] + time < t[v]) {
+                    t[v] = t[u] + time;
+                    pre[v] = u;
+                }
+            }
+        }
+    }
 }
 
-int getLen(vector<int> v) {
-	int s = v[0], len = 0;
-	for (int i = 1; i < v.size(); i++) {
-		len += length[s * 1000 + v[i]];
-		s = v[i];
-	}
-	return len;
+void dijkstra_t(int s) {
+    fill(t, t + MAX_V, INF);
+    fill(num, num + MAX_V, INF);
+    fill(vis, vis + MAX_V, 0);
+    t[s] = 0;
+    num[s] = 0;
+    for(int i = 0; i < n; i++) {
+        int u = -1, MIN = INF;
+        for (int j = 0; j < n; j++) {
+            if (!vis[j] && t[j] < MIN) {
+                u = j;
+                MIN = t[j];
+            }
+        }
+        if (u == -1) {
+            return;
+        }
+        vis[u] = 1;
+        for (int j = 0; j < g[u].size(); j++) {
+            int v = g[u][j].v;
+            int time = g[u][j].t;
+            if (!vis[v]) {
+                if (t[u] + time < t[v]) {
+                    t[v] = t[u] + time;
+                    num[v] = num[u] + 1;
+                    pre[v] = u;
+                }
+                else if (t[u] + time == t[v] && num[u] + 1 < num[v]) {
+                    num[v] = num[u] + 1;
+                    pre[v] = u;
+                }
+            }
+        }
+    }
 }
 
-int getTime(vector<int> v) {
-	int s = v[0], t = 0;
-	for (int i = 1; i < v.size(); i++) {
-		t += tm[s * 1000 + v[i]];
-		s = v[i];
-	}
-	return t;
-}
-
-vector<vector<int>> findShortest(vector<vector<int>> vec) {
-	vector<vector<int>> res;
-	int MIN = 0x3fffffff;
-	for (auto v : vec) {
-		if (getLen(v) < MIN) {
-			MIN = getLen(v);
-			vector<vector<int>>().swap(res);
-			res.push_back(v);
-		}
-		else if (getLen(v) == MIN) {
-			res.push_back(v);
-		}
-	}
-	return res;
-}
-
-vector<vector<int>> findFastest(vector<vector<int>> vec) {
-	vector<vector<int>> res;
-	int MIN = 0x3fffffff;
-	for (auto v : vec) {
-		if (getTime(v) < MIN) {
-			MIN = getTime(v);
-			vector<vector<int>>().swap(res);
-			res.push_back(v);
-		}
-		else if (getTime(v) == MIN) {
-			res.push_back(v);
-		}
-	}
-	return res;
-}
-
-vector<vector<int>> findFewestInter(vector<vector<int>> vec) {
-	vector<vector<int>> res;
-	int MIN = 0x3fffffff;
-	for (auto v : vec) {
-		if (v.size() < MIN) {
-			MIN = v.size();
-			vector<vector<int>>().swap(res);
-			res.push_back(v);
-		}
-		else if (v.size() == MIN) {
-			res.push_back(v);
-		}
-	}
-	return res;
-}
-
-void show(vector<int> v) {
-	for (int i = 0; i < v.size(); i++) {
-		cout << v[i];
-		if (i < v.size() - 1) {
-			cout << " -> ";
-		}
-	}
-	cout << endl;
+void dfs(int v) {
+    if (v == st) {
+        return;
+    }
+    dfs(pre[v]);
+    path.push_back(v);
 }
 
 int main() {
-	int N, M;
-	cin >> N >> M;
-	for (int m = 0; m < M; m++) {
-		int v1, v2, one_way, l, t;
-		cin >> v1 >> v2 >> one_way >> l >> t;
-		g[v1].push_back(v2);
-		length[v1 * 1000 + v2] = l;
-		tm[v1 * 1000 + v2] = t;
-		if (!one_way) {
-			g[v2].push_back(v1);
-			length[v2 * 1000 + v1] = l;
-			tm[v2 * 1000 + v1] = t;
-		}
-	}
-	cin >> s >> d;
-	temp.push_back(s);
-	vis[s] = 1;
-	dfs(s);
-	vector<int>().swap(temp);
-	/*
-	for (auto v : res) {
-		for (auto it : v) {
-			cout << it << " ";
-		}
-		cout << endl;
-	}
-	// */
-	vector<vector<int>> shortest = findShortest(res);
-	vector<vector<int>> fastest = findFastest(res);
-	if (shortest.size() > 1) {
-		res = findFastest(shortest);
-		swap(res, shortest);
-		vector<vector<int>>().swap(res);
-	}
-	if (fastest.size() > 1) {
-		res = findFewestInter(fastest);
-		swap(res, fastest);
-		vector<vector<int>>().swap(res);
-	}
-	if (shortest[0] == fastest[0]) {
-		printf("Distance = %d; Time = %d: ", getLen(shortest[0]), getTime(shortest[0]));
-		show(shortest[0]);
-	}
-	else {
-		printf("Distance = %d: ", getLen(shortest[0]));
-		show(shortest[0]);
-		printf("Time = %d: ", getTime(fastest[0]));
-		show(fastest[0]);
-	}
-	return 0;
+    scanf("%d%d", &n, &m);
+    for (int i = 0; i < m; i++) {
+        int v1, v2, one_way, len, t;
+        scanf("%d%d%d%d%d", &v1, &v2, &one_way, &len, &t);
+        g[v1].push_back(Node(v2, len, t));
+        if (!one_way) {
+            g[v2].push_back(Node(v1, len, t));
+        }
+    }
+    scanf("%d%d", &st, &ed);
+    dijkstra_dis(st);
+    dfs(ed);
+    vector<int> path_dis(path);
+    path.clear();
+    dijkstra_t(st);
+    dfs(ed);
+    vector<int> path_time(path);
+    if (path_dis == path_time) {
+        printf("Distance = %d; Time = %d: %d", d[ed], t[ed], st);
+        for (int i = 0; i < path_dis.size(); i++) {
+            printf(" -> %d", path_dis[i]);
+        }
+        printf("\n");
+    }
+    else {
+        printf("Distance = %d: %d", d[ed], st);
+        for (int i = 0; i < path_dis.size(); i++) {
+            printf(" -> %d", path_dis[i]);
+        }
+        printf("\n");
+        printf("Time = %d: %d", t[ed], st);
+        for (int i = 0; i < path_time.size(); i++) {
+            printf(" -> %d", path_time[i]);
+        }
+        printf("\n");
+    }
+    return 0;
 }
 
 /*
