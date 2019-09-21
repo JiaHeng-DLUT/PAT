@@ -4,5 +4,7 @@
 
 ## Error-Prone Problems
 
+- scanf("%d", ***&***x);
+- 使用 `index` 作为全局变量会出问题。 
 - 1052
 - 1053
